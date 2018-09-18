@@ -13,5 +13,13 @@ public class Main {
 
 
          */
+
+        defaultMethod();
+    }
+
+    public static void defaultMethod(){
+        System.out.println("Default method working.");
+        System.out.println("You may proceed with your work.");
+        System.out.println("Enjoy!");
     }
 }
