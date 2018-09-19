@@ -31,12 +31,13 @@ public class Main {
         char[] buff = new char[8];
         int length;
         Reader reader = null;
+        Helper helper = new Helper();
 
         try {
-            reader = Helper.openReader("file1.txt")//method to be added later
+            reader = helper.openReader("file1.txt");//method to be added later
             while ((length = reader.read(buff)) >= 0) {
                 System.out.println("\nlength" + length);
-                for (int i = o; i < length; i++) {
+                for (int i = 0; i < length; i++) {
                     System.out.println(buff[i]);
                 }
             }
@@ -57,10 +58,12 @@ public class Main {
     public static void doTryWithResources(){
         char[] buff = new char[8];
         int length;
-        try (Reader reader = Helper.openReader("file1.txt")) {
+        Helper helper = new Helper();
+
+        try (Reader reader = helper.openReader("file1.txt")) {
             while ((length = reader.read(buff)) >= 0) {
                 System.out.println("\nlength" + length);
-                for (int i = o; i < length; i++) {
+                for (int i = 0; i < length; i++) {
                     System.out.println(buff[i]);
                 }
             }
@@ -73,9 +76,10 @@ public class Main {
     public static void doTryWithResourcesMulti(){
         char[] buff = new char[8];
         int length;
+        Helper helper = new Helper();
         //We can call several resources for auto-closing
-        try (Reader reader = Helper.openReader("file1.txt");
-             Writer writer = Helper.openWriter("file2.txt")) {
+        try (Reader reader = helper.openReader("file1.txt");
+             Writer writer = helper.openWriter("file2.txt")) {
             while ((length = reader.read(buff)) >= 0) {
                 System.out.println("\nlength" + length);
                 writer.write(buff, 0, length);//what to write, how to offset, how long to write
