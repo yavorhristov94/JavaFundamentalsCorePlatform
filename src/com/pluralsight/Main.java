@@ -20,21 +20,17 @@ public class Main {
          */
 
         defaultMethod();
-//        if(args.length <1) {
-//            System.out.println("No arguments provided");
-//            showUsage();
-//            return;
-//        } else {
-//            for (String word : args) System.out.println(word);
-//            //If ran from cmdline with java.com.pluralsight.Main Hello world
-//            //this would print Hello word (on two separate rows)
-//        String filename = args[0];
-//        if(!Files.exists(Paths.get(filename))){System.out.println("\n File not found: "+filename);
-//        return;} else showFileLines(filename);
-//        }
 
+
+        String filename = readArguments(args);
+        if(!Files.exists(Paths.get(filename))){System.out.println("\n File not found: "+filename);
+        return;} else showFileLines(filename);
 
         fixFileName(args);
+        //Take argument
+        //Check for length of argument
+        //If longer than 1 word, check for quotes
+        //If no quotes, add them
     }
 
     public static void defaultMethod(){
@@ -42,10 +38,21 @@ public class Main {
         System.out.println("You may proceed with your work.");
         System.out.println("Enjoy!");
     }
+    public static String readArguments(String[] args){
+        boolean longArg = false;
+        String fn = null;
+        String argument = null;
+        if(args.length<1){showUsage();}
+        if(args.length >= 2){longArg = true;}else return fn = args[0];
+
+
+
+
+        return fn;
+    }
 
     public static void fixFileName(String[] args){
         //Check if filename has multiple spaces
-        if (args.length >= 1) {
             StringBuilder fixer = new StringBuilder();
             for (String word : args){
                 fixer.append(word);
@@ -57,8 +64,6 @@ public class Main {
             }
             fixer.setLength(fixer.length() - 1); //remove the last, unneeded space
             System.out.println(fixer.toString());
-        }
-
 
     }
     public static void showFileLines (String filename){
