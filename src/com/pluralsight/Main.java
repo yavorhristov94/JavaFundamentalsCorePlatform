@@ -34,12 +34,44 @@ public class Main {
     public static void start() {
         //keeping the main process clean
         try {
-
+//            doAdder();
+            doThreadedAdder();
         } catch (Exception e){}
 
     }
 
+    public static void doAdder() throws IOException{
+        String[] inFiles = {"./file1.txt", "./file2.txt", "./file3.txt", };
+        String[] outFiles = {"./file1.out.txt", "./file2.out.txt", "./file3.out.txt", };
 
+        for(int i=0; i <inFiles.length; i++){
+            Adder adder = new Adder(inFiles[i], outFiles[i]);
+            adder.doAdd();
+        }
+        //Looking at this in thread terms, this does one file at a time over a single thread
+    }
+
+    public static void doThreadedAdder() throws IOException, InterruptedException{
+        String[] inFiles = {"./file1.txt", "./file2.txt", "./file3.txt", };
+        String[] outFiles = {"./file1.out.txt", "./file2.out.txt", "./file3.out.txt", };
+
+        Thread[] threads = new Thread[inFiles.length];
+
+        for(int i=0; i <inFiles.length; i++){
+            Adder adder = new Adder(inFiles[i], outFiles[i]);
+//            Thread thread = new Thread(adder);
+//            This is commented out due to the alternate method we use, to prevent
+//            the main thread from closing before the others
+            threads[i] = new Thread(adder);
+            threads[i].start();
+        }
+        //And this fires up a thread for each run, for each file
+
+        for(Thread thread:threads){
+            thread.join();//this joins ALL the threads to main so that they will be waited for
+        }
+
+    }
 
     public static void defaultMethod() {
         System.out.println("Default method working.");
