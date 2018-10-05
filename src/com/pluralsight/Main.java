@@ -4,6 +4,10 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Properties;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.*;
 
 public class Main {
@@ -35,9 +39,47 @@ public class Main {
         //keeping the main process clean
         try {
 //            doAdder();
-            doThreadedAdder();
+//            doThreadedAdder();
+//            doPooledThreadedAdder();
+            doRelatedAdder();
         } catch (Exception e){}
 
+    }
+
+    public static void doRelatedAdder() throws Exception,IOException, InterruptedException{
+        String[] inFiles = {"./file1.txt", "./file2.txt", "./file3.txt", };
+        ExecutorService es = Executors.newFixedThreadPool(3);
+        Future<Integer>[] results = new Future[inFiles.length];
+        //future represents a background task, templated on the return type
+
+        for(int i=0; i <inFiles.length; i++){
+            AdderCallable adder = new AdderCallable(inFiles[i]);
+            results[i] = es.submit(adder);
+        }
+
+        for(Future<Integer> result:results){
+            int value = result.get(); //blocks until return value available
+            System.out.println("Total: "+value);
+        }
+
+        es.shutdown();
+        es.awaitTermination(60, TimeUnit.SECONDS);
+
+
+    }
+
+    public static void doPooledThreadedAdder() throws IOException, InterruptedException{
+        String[] inFiles = {"./file1.txt", "./file2.txt", "./file3.txt", };
+        String[] outFiles = {"./file1.out.txt", "./file2.out.txt", "./file3.out.txt", };
+
+        ExecutorService es = Executors.newFixedThreadPool(3);
+
+        for(int i=0; i <inFiles.length; i++){
+            Adder adder = new Adder(inFiles[i], outFiles[i]);
+            es.submit(adder);
+        }
+        es.shutdown();
+        es.awaitTermination(60, TimeUnit.SECONDS);
     }
 
     public static void doAdder() throws IOException{
