@@ -9,7 +9,7 @@ import java.util.concurrent.Callable;
 public class AdderCallable implements Callable<Integer> {
 
     private String inFile;
-    public AdderCallable(String inFile) {}
+    public AdderCallable(String inFile) {this.inFile = inFile;}
 
 
     public int returnAdd() throws IOException {

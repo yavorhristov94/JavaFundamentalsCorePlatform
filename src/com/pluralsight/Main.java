@@ -41,8 +41,25 @@ public class Main {
 //            doAdder();
 //            doThreadedAdder();
 //            doPooledThreadedAdder();
-            doRelatedAdder();
-        } catch (Exception e){}
+//            doRelatedAdder();
+              banker();
+        } catch (Exception e){System.out.println(e.getMessage() + e.getCause());}
+
+    }
+
+
+    public static void banker() throws Exception{
+        ExecutorService es = Executors.newFixedThreadPool(5);
+        BankAccount account = new BankAccount(100);
+
+//        for(int i=0;i<5;i++){
+            BankWorker worker = new BankWorker(account);
+            es.submit(worker);
+//        }
+
+
+        es.shutdown();
+        es.awaitTermination(60, TimeUnit.SECONDS);
 
     }
 
@@ -55,6 +72,7 @@ public class Main {
         for(int i=0; i <inFiles.length; i++){
             AdderCallable adder = new AdderCallable(inFiles[i]);
             results[i] = es.submit(adder);
+            //A ref of each Future background task is put into the results array
         }
 
         for(Future<Integer> result:results){
@@ -64,7 +82,6 @@ public class Main {
 
         es.shutdown();
         es.awaitTermination(60, TimeUnit.SECONDS);
-
 
     }
 
@@ -82,16 +99,6 @@ public class Main {
         es.awaitTermination(60, TimeUnit.SECONDS);
     }
 
-    public static void doAdder() throws IOException{
-        String[] inFiles = {"./file1.txt", "./file2.txt", "./file3.txt", };
-        String[] outFiles = {"./file1.out.txt", "./file2.out.txt", "./file3.out.txt", };
-
-        for(int i=0; i <inFiles.length; i++){
-            Adder adder = new Adder(inFiles[i], outFiles[i]);
-            adder.doAdd();
-        }
-        //Looking at this in thread terms, this does one file at a time over a single thread
-    }
 
     public static void doThreadedAdder() throws IOException, InterruptedException{
         String[] inFiles = {"./file1.txt", "./file2.txt", "./file3.txt", };
@@ -114,6 +121,18 @@ public class Main {
         }
 
     }
+
+    public static void doAdder() throws IOException{
+        String[] inFiles = {"./file1.txt", "./file2.txt", "./file3.txt", };
+        String[] outFiles = {"./file1.out.txt", "./file2.out.txt", "./file3.out.txt", };
+
+        for(int i=0; i <inFiles.length; i++){
+            Adder adder = new Adder(inFiles[i], outFiles[i]);
+            adder.doAdd();
+        }
+        //Looking at this in thread terms, this does one file at a time over a single thread
+    }
+
 
     public static void defaultMethod() {
         System.out.println("Default method working.");
