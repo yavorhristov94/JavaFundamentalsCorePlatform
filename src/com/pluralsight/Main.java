@@ -51,6 +51,7 @@ public class Main {
     public static void banker() throws Exception{
         ExecutorService es = Executors.newFixedThreadPool(5);
         BankAccount account = new BankAccount(100);
+        NonSafeAccount account2 = new NonSafeAccount(100);
 
 //          One thread, will always work, though slow
 //        BankWorker worker = new BankWorker(account);
@@ -62,17 +63,17 @@ public class Main {
 //            es.submit(worker);    }
 
         //but with the methods syyycnhed all works fine!
-        for(int i=0;i<5;i++){
-            BankWorker worker = new BankWorker(account);
-            es.submit(worker);
-        }
-//W
-
-
 //        for(int i=0;i<5;i++){
 //            BankWorker worker = new BankWorker(account);
-//            es.submit(worker);
-//        }
+//            es.submit(worker);}
+
+        //synching inside the method manually also works
+        for(int i=0;i<5;i++){
+        NonSafeWorker worker2 = new NonSafeWorker(account2);
+        es.submit(worker2);}
+
+
+
         es.shutdown();
         es.awaitTermination(60, TimeUnit.SECONDS);
 
