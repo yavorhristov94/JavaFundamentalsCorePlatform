@@ -7,11 +7,11 @@ public class BankWorker implements Runnable {
 
     public void run(){
         for(int i=0; i<10;i++) {
-            System.out.println("Im here");
+            System.out.println("Running Method");
             int startBalance = account.getBalance();
             account.deposit(10);
             int endBalance = account.getBalance();
-            System.out.println(endBalance + startBalance);
+            System.out.println(startBalance + " " + endBalance);
         }
     }
 

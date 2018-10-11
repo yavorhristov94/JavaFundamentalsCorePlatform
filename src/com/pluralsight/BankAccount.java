@@ -5,7 +5,7 @@ public class BankAccount {
 
     public BankAccount(int startBalance){balance = startBalance;}
 
-    public int getBalance(){return balance;}
+    public synchronized int getBalance(){return balance;}
 
-    public void deposit(int amount){balance += amount;}
+    public synchronized void deposit(int amount){balance += amount;}
 }
