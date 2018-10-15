@@ -42,11 +42,28 @@ public class Main {
 //            doThreadedAdder();
 //            doPooledThreadedAdder();
 //            doRelatedAdder();
-              banker();
+//            banker();
+            transactioner();
         } catch (Exception e){System.out.println(e.getMessage() + e.getCause());}
 
     }
 
+    public static void transactioner() throws Exception{
+        ExecutorService es = Executors.newFixedThreadPool(5);
+        BankAccount acc1 = new BankAccount(490);
+        BankAccount acc2 = new BankAccount(490);
+
+        TxWorker[] workers = {
+                new TxWorker(acc1, 'd', 100),
+                new TxWorker(acc1, 'w', 10),
+                new TxWorker(acc2, 'd', 10)
+        }; //Retrieve TxWorker instances
+
+        for(TxWorker worker:workers) es.submit(worker);
+
+        es.shutdown();
+        es.awaitTermination(60, TimeUnit.SECONDS);
+    }
 
     public static void banker() throws Exception{
         ExecutorService es = Executors.newFixedThreadPool(5);
