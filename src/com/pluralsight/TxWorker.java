@@ -11,11 +11,12 @@ public class TxWorker implements Runnable{
     }
 
     public void run(){
-        synchronized (account) {//This prevents ops from running over each other
+        //This prevents ops from running over each other
         if (txType =='w'){
             account.withdraw(amt); System.out.println("Finishing op "+account.getBalance() );}
         else if (txType == 'd') {
-                account.deposit(amt);
+            synchronized (account){
+            account.deposit(amt);
                 System.out.println("Finishing op "+account.getBalance() );
                 if (account.getBalance() > 500) {
                     int bonus = (int) ((account.getBalance() - 500) * 0.1);

@@ -59,7 +59,7 @@ public class Main {
                 new TxWorker(acc2, 'd', 10)
         }; //Retrieve TxWorker instances
 
-        for(TxWorker worker:workers) es.submit(worker);
+        for(TxWorker worker:workers) {es.submit(worker); es.wait(0, 10);}
 
         es.shutdown();
         es.awaitTermination(60, TimeUnit.SECONDS);
