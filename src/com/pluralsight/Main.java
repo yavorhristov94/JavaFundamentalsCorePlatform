@@ -67,6 +67,16 @@ public class Main {
         } catch (Exception e){System.out.println(e.getMessage() + e.getCause());}
     }
 
+    static void workDispatch(String workerTypeName, Object workerTarget)
+            throws  Exception{
+        Class<?> workerType = Class.forName(workerTypeName);
+        TaskWorker worker = (TaskWorker) workerType.newInstance();
+        //by doing this, we limit the reflection work done, thus improving performance
+
+        worker.setTarget(workerTarget);
+        worker.doWork();
+    }
+
     static void instancingTypes(String workerTypeName, Object workerTarget)
             throws  Exception{
         Class<?> workerType = Class.forName(workerTypeName);
