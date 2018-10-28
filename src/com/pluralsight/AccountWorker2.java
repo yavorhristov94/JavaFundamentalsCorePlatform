@@ -1,5 +1,6 @@
 package com.pluralsight;
 
+@Main.WorkHandler(useThreadPool = false) //using the declared annotation
 public class AccountWorker2 implements Runnable, TaskWorker {
 
     BankAccount ba;

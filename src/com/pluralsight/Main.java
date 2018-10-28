@@ -1,6 +1,8 @@
 package com.pluralsight;
 
 import java.io.*;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -13,11 +15,17 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.*;
 
+
+
 public class Main {
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface WorkHandler{boolean useThreadPool();} //declaring an annotation
+    //depending on if we wanna use a thread pool or not
 
     static Logger logger2 = LogManager.getLogManager().getLogger(Logger.GLOBAL_LOGGER_NAME);
     //New way, since it makes it a static value for all and does the whole call in one line
 
+    static ExecutorService pool = Executors.newFixedThreadPool(5);
 
     public static void main(String[] args) {
         // This is the base branch, from which we expand for specific lessons
@@ -44,8 +52,9 @@ public class Main {
             BankAccount acct1 = new BankAccount(100, "One");
 
 
-            instancingTypes("com.pluralsight.AccountWorker", acct1);
-
+//            instancingTypes("com.pluralsight.AccountWorker", acct1);
+//              workDispatch("com.pluralsight.AccountWorker2", acct1);
+            annotatedWorkDispatch("com.pluralsight.AccountWorker2", acct1);
 
 
             //We want to get the simplename under the Class class for this account
@@ -67,10 +76,33 @@ public class Main {
         } catch (Exception e){System.out.println(e.getMessage() + e.getCause());}
     }
 
+    static void annotatedWorkDispatch(String workerTypeName, Object workerTarget)
+            throws  Exception{
+        Class<?> workerType = Class.forName(workerTypeName);
+        TaskWorker worker = (TaskWorker) workerType.getDeclaredConstructor().newInstance();
+
+        //by doing this, we limit the reflection work done, thus improving performance
+
+        worker.setTarget(workerTarget);
+
+        WorkHandler wh = workerType.getAnnotation(WorkHandler.class);
+        if(wh == null) System.out.println("Boo");
+
+        if (wh.useThreadPool()) pool.submit(new Runnable() {
+            @Override
+            public void run() {
+                worker.doWork();
+            }
+        });
+        else
+        worker.doWork();
+    }
+
     static void workDispatch(String workerTypeName, Object workerTarget)
             throws  Exception{
         Class<?> workerType = Class.forName(workerTypeName);
-        TaskWorker worker = (TaskWorker) workerType.newInstance();
+        TaskWorker worker = (TaskWorker) workerType.getDeclaredConstructor().newInstance();
+
         //by doing this, we limit the reflection work done, thus improving performance
 
         worker.setTarget(workerTarget);

@@ -1,5 +1,6 @@
 package com.pluralsight;
 
+@Deprecated
 public class AccountWorker implements Runnable{
 
     BankAccount ba;
