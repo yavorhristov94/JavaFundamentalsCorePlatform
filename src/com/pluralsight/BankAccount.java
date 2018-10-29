@@ -1,5 +1,6 @@
 package com.pluralsight;
 
+@Main.ProcessedBy(AccountWorker2.class)
 public class BankAccount {
     private int balance;
     private final String id;

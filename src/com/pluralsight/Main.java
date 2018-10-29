@@ -1,8 +1,10 @@
 package com.pluralsight;
 
 import java.io.*;
+import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -15,12 +17,17 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.*;
 
+import static sun.security.krb5.internal.crypto.Nonce.value;
 
 
 public class Main {
+    @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.RUNTIME)
     public @interface WorkHandler{boolean useThreadPool();} //declaring an annotation
     //depending on if we wanna use a thread pool or not
+
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface ProcessedBy{Class<?> value();}
 
     static Logger logger2 = LogManager.getLogManager().getLogger(Logger.GLOBAL_LOGGER_NAME);
     //New way, since it makes it a static value for all and does the whole call in one line
@@ -54,8 +61,8 @@ public class Main {
 
 //            instancingTypes("com.pluralsight.AccountWorker", acct1);
 //              workDispatch("com.pluralsight.AccountWorker2", acct1);
-            annotatedWorkDispatch("com.pluralsight.AccountWorker2", acct1);
-
+//            annotatedWorkDispatch("com.pluralsight.AccountWorker2", acct1);
+            annotatedWorkDispatch2(acct1);
 
             //We want to get the simplename under the Class class for this account
             //But for this, we need to reference the class itself first
@@ -74,6 +81,28 @@ public class Main {
 //            callRemoteMethod(acct1);
 //            System.out.println(acct1.getBalance());
         } catch (Exception e){System.out.println(e.getMessage() + e.getCause());}
+    }
+
+    static void annotatedWorkDispatch2(Object workerTarget) throws Exception{
+        Class<?> wTarget = workerTarget.getClass();
+        ProcessedBy pb = wTarget.getAnnotation(ProcessedBy.class);
+
+        Class<?> workerType = pb.value();
+        //we get the class object of the annotation, stating which worker this should be
+        TaskWorker worker = (TaskWorker) workerType.getDeclaredConstructor().newInstance();
+
+        WorkHandler wh = workerType.getAnnotation(WorkHandler.class);
+        if(wh == null) System.out.println("Boo");
+
+        if (wh.useThreadPool()) pool.submit(new Runnable() {
+            @Override
+            public void run() {
+                worker.doWork();
+            }
+        });
+        else
+            worker.doWork();
+
     }
 
     static void annotatedWorkDispatch(String workerTypeName, Object workerTarget)
