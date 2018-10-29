@@ -42,6 +42,22 @@ public class Main {
         } catch (Exception e){System.out.println(e.getMessage() + e.getCause());}
     }
 
+    private static void saveGroup(AccountGroup g, String filename){
+        try(ObjectOutputStream objectStream = new ObjectOutputStream((Files.newOutputStream(Paths.get(filename))))){
+            objectStream.writeObject(g);
+        }catch(IOException e){System.out.println(e.getMessage() + e.getCause());}
+    }
+
+    private static AccountGroup loadGroup(String filename) {
+        AccountGroup g = null;
+        try (ObjectInputStream objectStream = new ObjectInputStream((Files.newInputStream(Paths.get(filename))))) {
+            g = (AccountGroup) objectStream.readObject();
+        } catch (IOException e) {
+            System.out.println(e.getMessage() + e.getCause());
+        }catch (ClassNotFoundException e){System.out.println(e.getMessage() + e.getCause());}
+        return g;
+    }
+
     private static void saveAccount(BankAccount ba, String filename) throws Exception {
         //Setting up the serialization of objects via Object stream
         try( ObjectOutputStream objectStream = new ObjectOutputStream(Files.newOutputStream(Paths.get(filename)));){
