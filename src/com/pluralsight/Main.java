@@ -1,21 +1,13 @@
 package com.pluralsight;
 
-import java.io.*;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
+
+import jdk.nashorn.internal.runtime.ECMAException;
+
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Properties;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.*;
-
-
 
 public class Main {
 
@@ -41,8 +33,31 @@ public class Main {
     public static void start() {
         //keeping the main process clean
         try {
+            BankAccount acct1 = new BankAccount("1234", 500);
+            acct1.depostit(250);
+            saveAccount(acct1, "account.dat");
+            BankAccount acct2 = loadAccount("account.dat");
+            System.out.println(acct2.getBalance());
 
         } catch (Exception e){System.out.println(e.getMessage() + e.getCause());}
+    }
+
+    private static void saveAccount(BankAccount ba, String filename) throws Exception {
+        //Setting up the serialization of objects via Object stream
+        try( ObjectOutputStream objectStream = new ObjectOutputStream(Files.newOutputStream(Paths.get(filename)));){
+            objectStream.writeObject(ba); //just give it the ref of the Obj to serialize
+        }catch (IOException e){System.out.println(e.getMessage() + e.getCause());}
+
+    }
+
+    private static BankAccount loadAccount(String filename){
+        BankAccount baLoad = null;
+        try(ObjectInputStream objectStream = new ObjectInputStream(Files.newInputStream(Paths.get(filename)))){
+            baLoad = (BankAccount) objectStream.readObject();
+        }catch (IOException e){System.out.println(e.getMessage() + e.getCause());
+        }catch (ClassNotFoundException e2){System.out.println(e2.getMessage() + e2.getCause());}
+
+        return baLoad;
     }
 
 
